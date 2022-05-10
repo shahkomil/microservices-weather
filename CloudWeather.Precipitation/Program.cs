@@ -12,6 +12,7 @@ builder.Services.AddDbContext<PrecipDbContext>(opts =>
 },ServiceLifetime.Transient);
 
 var app = builder.Build();
+
 app.MapGet("/observation/{zip}", async(string zip,[FromQuery] int? days,PrecipDbContext db) =>
 {
     if (days == null || days < 1 || days > 30) { 
