@@ -17,12 +17,12 @@ namespace CloudWeather.Report.BusinessLogic
         /// <param> name ="zip"</param>
         /// <param> name ="days"</param>
         /// <returns></returns>
-        public Task<WeatherReport> BuildReport(string zip, string days);
+        public Task<WeatherReport> BuildReport(string zip, int days);
     }
 
     
 
-    public class WeatherReportAggregator :IWeatherReportAggregator
+    public class WeatherReportAggregator : IWeatherReportAggregator
     {
         private readonly IHttpClientFactory _http;
         private readonly ILogger _logger;
@@ -41,7 +41,7 @@ namespace CloudWeather.Report.BusinessLogic
             _db = db;
         }
             
-        public async Task<WeatherReport> BuildWeeklyReport(string zip, string days)
+        public async Task<WeatherReport> BuildReport(string zip, string days)
         {
             var httpClient = _http.CreateClient();
             var precipData = await FetchPrecipitationData(httpClient, zip, days);
@@ -135,6 +135,11 @@ namespace CloudWeather.Report.BusinessLogic
             var tempServiceHost = _weatherDataConfig.TempDataHost;
             var tempServicePost = _weatherDataConfig.TempDataPort;
             return $"{tempServiceProtocol}:// {tempServiceHost}:{tempServicePost}/observation/{zip}?days={days}";
+        }
+
+        public Task<WeatherReport> BuildReport(string zip, int days)
+        {
+            throw new NotImplementedException();
         }
     }
 }
