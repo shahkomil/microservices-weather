@@ -40,8 +40,8 @@ namespace CloudWeather.Report.BusinessLogic
             _weatherDataConfig = weatherConfig.Value;
             _db = db;
         }
-            
-        public async Task<WeatherReport> BuildReport(string zip, string days)
+
+        async Task<WeatherReport> IWeatherReportAggregator.BuildReport(string zip, int days)
         {
             var httpClient = _http.CreateClient();
             var precipData = await FetchPrecipitationData(httpClient, zip, days);
@@ -92,7 +92,7 @@ namespace CloudWeather.Report.BusinessLogic
             return Math.Round(totalSnow,1);
         }
 
-        private async Task<List<TemperatureModel>> FetchTemperatureData(HttpClient httpClient, string zip, string days)
+        private async Task<List<TemperatureModel>> FetchTemperatureData(HttpClient httpClient, string zip, int days)
         {
             var endpoint = BuildTemperatureServiceEndpoint(zip, days);
             var temperatureRecords = await httpClient.GetAsync(endpoint);
@@ -105,7 +105,7 @@ namespace CloudWeather.Report.BusinessLogic
             return temperatureData ?? new List<TemperatureModel>();
         }
 
-        private async Task<List<PrecipitationModel>> FetchPrecipitationData(HttpClient httpClient, string zip, string days)
+        private async Task<List<PrecipitationModel>> FetchPrecipitationData(HttpClient httpClient, string zip, int days)
         {
             var endpoint = BuildPrecipitationServiceEndpoint(zip, days);
             var precipitationRecords = await httpClient.GetAsync(endpoint);
@@ -121,25 +121,24 @@ namespace CloudWeather.Report.BusinessLogic
             return precipitationData ?? new List<PrecipitationModel>();
         }
 
-        private string BuildPrecipitationServiceEndpoint(string zip, string days)
+        private string BuildPrecipitationServiceEndpoint(string zip, int days)
         {
-            var precipServiceProtocol = _weatherDataConfig.TempDataProtocol;
-            var precipServiceHost = _weatherDataConfig.TempDataHost;
-            var precipServicePost = _weatherDataConfig.TempDataPort;
-            return $"{precipServiceProtocol}:// {precipServiceHost}:{precipServicePost}/observation/{zip}?days={days}";
+            var precipServiceProtocol = _weatherDataConfig.PrecipDataProtocol;
+            var precipServiceHost = _weatherDataConfig.PrecipDataHost;
+            var precipServicePort = _weatherDataConfig.PrecipDataPort;
+            return $"{precipServiceProtocol}://{precipServiceHost}:{precipServicePort}/observation/{zip}?days={days}";
         }
 
-        private string BuildTemperatureServiceEndpoint(string zip, string days)
+        private string BuildTemperatureServiceEndpoint(string zip, int days)
         {
             var tempServiceProtocol = _weatherDataConfig.TempDataProtocol;
             var tempServiceHost = _weatherDataConfig.TempDataHost;
-            var tempServicePost = _weatherDataConfig.TempDataPort;
-            return $"{tempServiceProtocol}:// {tempServiceHost}:{tempServicePost}/observation/{zip}?days={days}";
+            var tempServicePort = _weatherDataConfig.TempDataPort;
+            return $"{tempServiceProtocol}://{tempServiceHost}:{tempServicePort}/observation/{zip}?days={days}";
+            //return $"http://localhost:3000/observation/{zip}?days={days}";
         }
 
-        public Task<WeatherReport> BuildReport(string zip, int days)
-        {
-            throw new NotImplementedException();
-        }
+        
+       
     }
 }
